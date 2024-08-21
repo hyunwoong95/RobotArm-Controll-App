@@ -1,14 +1,24 @@
 package com.example.arduinotestapp;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -45,29 +55,11 @@ import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
-    TextView mTvBluetoothStatus;
-    TextView mTvReceiveData;
-    TextView mTvSendData;
+    TextView BluetoothDeviceName;
     ImageButton mSetting;
     ImageButton mBtnSearch;
     Button mPlay;
     Button mTeachingData;
-
-    BluetoothAdapter mBluetoothAdapter;
-    Set<BluetoothDevice> mPairedDevices;
-    List<String> mListPairedDevices;
-
-    List<Map<String,String>> dataDevice;    //list - Device목록 저장
-    Handler mBluetoothHandler;
-    BluetoothDevice mBluetoothDevice;
-    BluetoothSocket mBluetoothSocket;
-
-    final static int BT_REQUEST_ENABLE = 1;
-    final static int BT_MESSAGE_READ = 2;
-    final static int BT_CONNECTING_STATUS = 3;
-
-    //final static UUID BT_UUID = UUID.fromString("8CE255C0-200A-11E0-AC64-0800200C9A66");    // 핸드폰대 핸드폰일경우
-    final static UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");    // 아두이노 블루투스 연결일경우
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,46 +73,39 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
 
-        mTvBluetoothStatus = (TextView) findViewById(R.id.tvBluetoothStatus);
+        BluetoothDeviceName = (TextView) findViewById(R.id.BluetoothDeviceName);
+        BluetoothDeviceName.setText("");
+        BluetoothDeviceName.append("No connected Device");
+
         mBtnSearch = (ImageButton) findViewById(R.id.bluetoothScan);
         mPlay = (Button) findViewById(R.id.playControl);
         mTeachingData = (Button) findViewById(R.id.teachingData);
 
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();   // getDefaultAdapter()메서드는 해당 디바이스가 블루투스를 지원하는지 여부를 반납한다.
-
-
         mBtnSearch.setOnClickListener(new Button.OnClickListener() {   // 블루투스  스캔
             @Override
             public void onClick(View view) {
-                bluetoothScan();
+                Intent intent = new Intent(MainActivity.this,bluetoothDialog.class);
+                startActivity(intent);
+                finish();
             }
         });
+
         mPlay.setOnClickListener(new Button.OnClickListener() {  // 로봇암 조이스틱 엑티비티
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(MainActivity.this, joystickActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
         mTeachingData.setOnClickListener(new Button.OnClickListener() {   // 티칭데이터 엑티비티
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(MainActivity.this, teachingDataActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }
-    void bluetoothScan(){
-        if(mBluetoothAdapter == null){
-            Toast.makeText(getApplicationContext(),"블루투스를 지원하지 않는 기기입니다.",Toast.LENGTH_LONG).show();
-        }else{
-            if(mBluetoothAdapter.isEnabled()){
-                Toast.makeText(getApplicationContext(),"블루투스 검색을 시작합니다.", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
-                startActivityForResult(intent,0);
-            }else{
-                Toast.makeText(getApplicationContext(),"블루투스 활성화후에 시도해주세요.", Toast.LENGTH_LONG).show();
-                Intent intentBluetoothEnable = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(intentBluetoothEnable, BT_REQUEST_ENABLE);
-            }
-        }
-    }
+
 }
