@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,bluetoothDialog.class);
                 startActivity(intent);
-                finish();
+                //finish();
             }
         });
 
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, joystickActivity.class);
                 startActivity(intent);
-                finish();
+                //finish();
             }
         });
         mTeachingData.setOnClickListener(new Button.OnClickListener() {   // 티칭데이터 엑티비티
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, teachingDataActivity.class);
                 startActivity(intent);
-                finish();
+                //finish();
             }
         });
     }

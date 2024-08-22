@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Joystick">
+        <attr name="joystickBaseColor" format="color"/> <!--베이스의 색상을 지정한다.-->
+        <attr name="joystickStickColor" format="color"/>    <!--스틱의 색상을 지정한다.-->
+        <attr name="joystickBaseRatio" format="fraction"/>  <!--조이스틱 뷰 영역에서 베이스가 차지하는 비율을 지정한다.-->
+        <attr name="joystickStickRatio" format="fraction"/> <!--조이스틱 뷰 영역에서 스틱이 차지하는 비율을 지정한다.-->
+        <attr name="joystickUseSpring" format="boolean"/>   <!--스틱을 놓았다가 땟을때 베이스의 중앙으로 스틱이 이동할지를 지정한다.-->
+    </declare-styleable>
+</resources>

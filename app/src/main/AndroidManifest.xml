@@ -36,9 +36,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".bluetoothDialog"/>
-        <activity android:name=".joystickActivity"/>
-        <activity android:name=".teachingDataActivity"/>
+        <activity
+            android:name=".bluetoothDialog" />
+        <activity
+            android:name=".joystickActivity"
+            android:screenOrientation="landscape"/>
+        <activity
+            android:name=".teachingDataActivity"
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>
