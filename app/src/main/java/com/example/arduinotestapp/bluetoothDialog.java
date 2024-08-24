@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -123,6 +124,7 @@ public class bluetoothDialog extends AppCompatActivity {
             String deviceAddress = device.getAddress();
 
             if(!deviceList.contains(deviceName)){   // 중복된 장치 정보 제외
+                sDeviceList.add(device);
                 deviceList.add(deviceName);
                 deviceListAdapter.notifyDataSetChanged();
             }
@@ -137,7 +139,6 @@ public class bluetoothDialog extends AppCompatActivity {
                 String deviceAddress = device.getAddress();
 
                 if(!deviceList.contains(deviceName)){   // 중복된 장치 정보 제외
-                    sDeviceList.add(device);
                     deviceList.add(deviceName);
                     deviceListAdapter.notifyDataSetChanged();
                 }
@@ -169,6 +170,11 @@ public class bluetoothDialog extends AppCompatActivity {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
+            if(status == BluetoothGatt.GATT_SUCCESS){
+                Log.d("TAG","Services is discovered.");
+                Intent intent = new Intent("com.example.test.ACTION_GATT_DISCONNECTED");
+                sendBroadcast(intent);
+            }
         }
     };
 

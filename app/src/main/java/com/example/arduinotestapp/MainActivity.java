@@ -12,6 +12,7 @@ import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -21,6 +22,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -80,6 +83,15 @@ public class MainActivity extends AppCompatActivity {
         mBtnSearch = (ImageButton) findViewById(R.id.bluetoothScan);
         mPlay = (Button) findViewById(R.id.playControl);
         mTeachingData = (Button) findViewById(R.id.teachingData);
+
+//        int ACCESS_FINE_LOCATION = ContextCompat.checkSelfPermission(this,"andrid.permission.ACCESS_FINE_LOCATION");
+//        int BLUETOOTH = ContextCompat.checkSelfPermission(this,"android.permission.BLUETOOTH");
+//
+//        if(ACCESS_FINE_LOCATION == PackageManager.PERMISSION_DENIED && BLUETOOTH == PackageManager.PERMISSION_DENIED){
+//            ActivityCompat.requestPermissions(this,[ACCESS_FINE_LOCATION,BLUETOO);
+//        }
+
+
 
         mBtnSearch.setOnClickListener(new Button.OnClickListener() {   // 블루투스  스캔
             @Override
