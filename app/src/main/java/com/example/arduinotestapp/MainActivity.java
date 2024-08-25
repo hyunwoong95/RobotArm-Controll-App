@@ -39,6 +39,7 @@ import android.os.SystemClock;
 //import android.support.v7.app.AlertDialog;
 //import android.support.v7.app.AppCompatActivity;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
     ImageButton mBtnSearch;
     Button mPlay;
     Button mTeachingData;
+
+    Intent dIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
         mBtnSearch = (ImageButton) findViewById(R.id.bluetoothScan);
         mPlay = (Button) findViewById(R.id.playControl);
         mTeachingData = (Button) findViewById(R.id.teachingData);
+
+        Log.d("Main_TAG","MainActivity.");
+
 
 //        int ACCESS_FINE_LOCATION = ContextCompat.checkSelfPermission(this,"andrid.permission.ACCESS_FINE_LOCATION");
 //        int BLUETOOTH = ContextCompat.checkSelfPermission(this,"android.permission.BLUETOOTH");
@@ -119,5 +126,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }

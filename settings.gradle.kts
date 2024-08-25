@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "arduinoTestApp"
 include(":app")
 include(":joystick")
+include(":BleBluetooth")
