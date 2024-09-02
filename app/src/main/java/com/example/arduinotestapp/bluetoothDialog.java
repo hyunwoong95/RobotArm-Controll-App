@@ -114,6 +114,8 @@ public class bluetoothDialog extends AppCompatActivity {
                 final String name = btArrayAdapter.getItem(position);
                 final String address = deviceAddressArray.get(position);
 
+                Toast.makeText(getApplicationContext(),"select to " + name,Toast.LENGTH_SHORT).show();
+
                 boolean flag = true;
 
                 BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
@@ -121,6 +123,7 @@ public class bluetoothDialog extends AppCompatActivity {
                 // create & connect socket
                 try{
                     btSocket = createBluetoothSocket(device);
+                    btSocket.connect();
                 }catch(IOException e){
                     flag = false;
                     //textStatus.setText("connect failed!");
@@ -129,6 +132,7 @@ public class bluetoothDialog extends AppCompatActivity {
 
                 if(flag){
                     //textStatus.setText("connected to " + name);
+                    Toast.makeText(getApplicationContext(),"connected to " + name,Toast.LENGTH_SHORT).show();
                     connectedThread = new ConnectedThread(btSocket);
                     connectedThread.start();
                 }
@@ -145,6 +149,8 @@ public class bluetoothDialog extends AppCompatActivity {
                 final String name = scArrayAdapter.getItem(position);
                 final String address = scDeviceAddressArray.get(position);
 
+                Toast.makeText(getApplicationContext(),"select to " + name,Toast.LENGTH_SHORT).show();
+
                 boolean flag = true;
 
                 BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
@@ -152,14 +158,16 @@ public class bluetoothDialog extends AppCompatActivity {
                 // create & connect socket
                 try{
                     btSocket = createBluetoothSocket(device);
+                    btSocket.connect();
                 }catch(IOException e){
                     flag = false;
-                    //textStatus.setText("connect failed!");
+                    //textStatus.setText("connect failed!");s
                     e.printStackTrace();
                 }
 
                 if(flag){
                     //textStatus.setText("connected to " + name);
+                    Toast.makeText(getApplicationContext(),"connected to " + name,Toast.LENGTH_SHORT).show();
                     connectedThread = new ConnectedThread(btSocket);
                     connectedThread.start();
                 }
@@ -180,7 +188,7 @@ public class bluetoothDialog extends AppCompatActivity {
 
         if(pairedDevices.size() > 0){
             for(BluetoothDevice device : pairedDevices){
-                String deviceName = device.getName();
+                String deviceName = device.getName() != null ? device.getName() : "알수없는 장치";
                 String deviceHardwareAddress = device.getAddress();
 
                 btArrayAdapter.add(deviceName);
@@ -222,7 +230,7 @@ public class bluetoothDialog extends AppCompatActivity {
             if(BluetoothDevice.ACTION_FOUND.equals(action)){
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                String deviceName = device.getName();
+                String deviceName = device.getName() != null ? device.getName() : "알수없는 장치";
                 String deviceHardwareAddress = device.getAddress();
                 scArrayAdapter.add(deviceName);
                 scDeviceAddressArray.add(deviceHardwareAddress);
@@ -248,6 +256,5 @@ public class bluetoothDialog extends AppCompatActivity {
         }
         return  device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
     }
-
 
 }
