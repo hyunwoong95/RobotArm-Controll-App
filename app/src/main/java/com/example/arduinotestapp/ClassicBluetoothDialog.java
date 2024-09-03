@@ -1,25 +1,14 @@
 package com.example.arduinotestapp;
 
-import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothSocket;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,10 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -39,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class bluetoothDialog extends AppCompatActivity {
+public class ClassicBluetoothDialog extends AppCompatActivity {
 
     ListView pairedlistView;
     ListView scanlistView;
@@ -91,12 +77,12 @@ public class bluetoothDialog extends AppCompatActivity {
                     scanDevices(); // 주변 기기 검색
 
                 } else {  // 활성화가 되어 있지 않다면
-                    Toast.makeText(bluetoothDialog.this, "블루투스를 활성화 해주세요.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ClassicBluetoothDialog.this, "블루투스를 활성화 해주세요.", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(bluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(intent, 1);
                 }
             }else{
-                Toast.makeText(bluetoothDialog.this, "블루투스를 지원 하지 않는 기기입니다.", Toast.LENGTH_LONG).show();
+                Toast.makeText(ClassicBluetoothDialog.this, "블루투스를 지원 하지 않는 기기입니다.", Toast.LENGTH_LONG).show();
             }
         }catch (SecurityException e){
             e.printStackTrace();
