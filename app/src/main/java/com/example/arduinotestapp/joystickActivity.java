@@ -1,7 +1,12 @@
 package com.example.arduinotestapp;
 
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -10,7 +15,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.joystick.JoystickView;
 
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.UUID;
+
 public class joystickActivity extends AppCompatActivity {
+
+    String TAG = "JoystickActivity";
 
 
     /*
@@ -40,6 +51,18 @@ public class joystickActivity extends AppCompatActivity {
     TextView joystick02_Strength;
 
 
+
+    // UUID
+    UUID MY_CUSTOM_SERVICE_UUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
+    UUID MY_CUSTOM_CHARACTERISTIC_UUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
+    private BluetoothGatt bluetoothGatt = GattSingleton.getInstance().getBluetoothGatt();
+    private BluetoothGattService service = bluetoothGatt.getService(MY_CUSTOM_SERVICE_UUID);
+    private BluetoothGattCharacteristic characteristic = service.getCharacteristic(MY_CUSTOM_CHARACTERISTIC_UUID);
+
+    private Queue<byte[]> commandQueue = new LinkedList<>();
+    private boolean isWriting = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -65,6 +88,23 @@ public class joystickActivity extends AppCompatActivity {
                 joystick01_Strength.setText("strength: " + strength);
 
                 // x, y 값 블루투스 통해 송신
+                String header = "";
+
+                if(angle != 350){
+                    header = "s4-";
+                    header += Integer.toString(angle);
+                    byte[] data = header.getBytes();
+
+                    sendCommand(data);
+                }
+
+                if(strength != 350){
+                    header = "s5-";
+                    header += Integer.toString(strength);
+                    byte[] data = header.getBytes();
+
+                    sendCommand(data);
+                }
 
             }
         },100);
@@ -76,31 +116,61 @@ public class joystickActivity extends AppCompatActivity {
 
                 // x, y 값 블루투스 통해 송신
 
+                String header = "";
+
+                if(angle != 350){
+                    header = "s3-";
+                    header += Integer.toString(angle);
+                    byte[] data = header.getBytes();
+
+                    sendCommand(data);
+                }
+
+                if(strength != 350){
+                    header = "s2-";
+                    header += Integer.toString(strength);
+                    byte[] data = header.getBytes();
+
+                    sendCommand(data);
+                }
+
             }
         },100);
 
         leftTurn.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View view) {
+                String header = "s1-";
+                header += "450";
+                byte[] data = header.getBytes();
 
+                sendCommand(data);
             }
         });
 
         rigthTurn.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View view) {
+                String header = "s1-";
+                header += "250";
+                byte[] data = header.getBytes();
 
+                sendCommand(data);
             }
         });
 
         grip.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View view) {
+                String header = "s6-";
                 if(gripSw){ // 잡기 상태
-
+                    header += "1";
                 }else{  // 놓기 상태
-
+                    header += "0";
                 }
+
+                byte[] data = header.getBytes();
+                sendCommand(data);
             }
         });
 
@@ -115,5 +185,57 @@ public class joystickActivity extends AppCompatActivity {
 
 
     }
+
+    public void sendCommand(byte[] command){
+
+        commandQueue.add(command);
+        Log.d(TAG,"Command added to queue");
+
+        if(!isWriting){
+            processNextCommand();
+        }
+    }
+
+    private void processNextCommand() {
+        if (commandQueue.isEmpty()) {
+            isWriting = false;
+            Log.d(TAG,"Queue is empty, no more commands to process");
+            return;
+        }
+
+        isWriting = true;
+
+        byte[] command = commandQueue.poll();
+        Log.d(TAG,"Processing next command");
+
+        if (characteristic != null) {
+            characteristic.setValue(command);
+            boolean success = bluetoothGatt.writeCharacteristic(characteristic);
+            if (!success) {
+                Log.e(TAG, "Failed to write characteristic");
+                isWriting = false;
+            }
+        } else {
+            Log.e(TAG, "Characteristic is null, cannot send command");
+            isWriting = false;
+        }
+    }
+
+    // 블루투스 쓰기 완료 콜백에서 다음 명령을 처리
+    private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicWrite(gatt, characteristic, status);
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d(TAG, "Write successful");
+            } else {
+                Log.e(TAG, "Write failed with status: " + status);
+            }
+            // 쓰기 완료 후 다음 명령을 처리
+            processNextCommand();
+        }
+
+        // 기타 콜백 메서드...
+    };
 
 }

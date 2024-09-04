@@ -31,6 +31,11 @@ public class BLEBluetoothDialog extends AppCompatActivity {
 
     String TAG = "BLEBluetooth";
 
+    // UUID
+    UUID MY_CUSTOM_SERVICE_UUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
+    UUID MY_CUSTOM_CHARACTERISTIC_UUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
+
+
     ListView listView;
 
     private BluetoothManager bluetoothManager;
@@ -38,7 +43,6 @@ public class BLEBluetoothDialog extends AppCompatActivity {
     private BluetoothLeScanner bluetoothLeScanner;
 
     private BluetoothDevice device;
-    private BluetoothDevice Activitydevice;
     private ArrayAdapter<String> deviceListAdapter;
     private ArrayList<String> deviceList;
     private ArrayList<BluetoothDevice> sDeviceList;
@@ -174,27 +178,52 @@ public class BLEBluetoothDialog extends AppCompatActivity {
             super.onServicesDiscovered(gatt, status);
             if(status == BluetoothGatt.GATT_SUCCESS){
                 Log.d(TAG,"Services is discovered.");
-                Toast.makeText(getApplicationContext(),"connected Device!",Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),"connected Device!",Toast.LENGTH_LONG).show();
 
-                List<BluetoothGattService> services = gatt.getServices();
-                BluetoothGattService service = services.get(0);
-                BluetoothGattCharacteristic characteristic = service.getCharacteristic(UUID.fromString("CHARACTERISTIC_UUID"));
 
-                // 읽기
-                //gatt.readCharacteristic(characteristic);
+                // 검색된 모든 서비스와 그 특성들을 로그로 출력
+                for (BluetoothGattService service : gatt.getServices()) {
+                    Log.d(TAG, "Service UUID: " + service.getUuid().toString());
+                    for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
+                        Log.d(TAG, "Characteristic UUID: " + characteristic.getUuid().toString());
+                    }
+                }
 
-                //쓰기
-                byte[] data = "Hello Robot!".getBytes();
+                // MY_CUSTOM_SERVICE_UUID로 서비스 검색
+                BluetoothGattService service = gatt.getService(MY_CUSTOM_SERVICE_UUID);
+                if (service == null) {
+                    Log.e(TAG, "Custom Service not found!");
+                    return;
+                }
+
+                // MY_CUSTOM_CHARACTERISTIC_UUID로 특성 검색
+                BluetoothGattCharacteristic characteristic = service.getCharacteristic(MY_CUSTOM_CHARACTERISTIC_UUID);
+                if (characteristic == null) {
+                    Log.e(TAG, "Custom Characteristic not found!");
+                    return;
+                }
+
+                // 데이터 쓰기
+                String str = "Hello Robot!";
+                byte[] data = str.getBytes();
                 characteristic.setValue(data);
-                gatt.writeCharacteristic(characteristic);
+                boolean success = gatt.writeCharacteristic(characteristic);
 
+                if (success) {
+                    Log.d(TAG, "Data written successfully.");
+                } else {
+                    Log.e(TAG, "Failed to write data.");
+                }
+
+                // MainActivity로 BLE 디바이스 정보 전달
                 Intent intent = new Intent(BLEBluetoothDialog.this, MainActivity.class);
-                intent.putExtra("BleDevice",Activitydevice.getName());
                 startActivity(intent);
 
 
 //                Intent intent = new Intent("com.example.test.ACTION_GATT_DISCONNECTED");
 //                sendBroadcast(intent);
+            }else {
+                Log.w(TAG, "onServicesDiscovered received: " + status);
             }
         }
 
@@ -203,6 +232,7 @@ public class BLEBluetoothDialog extends AppCompatActivity {
             super.onCharacteristicRead(gatt, characteristic, status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 // Characteristic 읽기 성공
+                Log.d(TAG,"read success!");
             }
         }
 
@@ -211,6 +241,7 @@ public class BLEBluetoothDialog extends AppCompatActivity {
             super.onCharacteristicWrite(gatt, characteristic, status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 // Characteristic 쓰기 성공
+                Log.d(TAG,"write success!");
             }
         }
 
@@ -227,8 +258,10 @@ public class BLEBluetoothDialog extends AppCompatActivity {
     private void connectToDevice(BluetoothDevice device){
         Log.d(TAG,"select Device: " + device.getName());
 
-        Activitydevice = device;
         BluetoothGatt bluetoothGatt = device.connectGatt(this, false, gattCallback);
+
+        GattSingleton.getInstance().setBluetoothGatt(bluetoothGatt);
+        GattSingleton.getInstance().setBluetoothDevice(device);
     }
 
 }
