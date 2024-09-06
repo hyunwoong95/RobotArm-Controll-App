@@ -44,6 +44,8 @@
         <activity
             android:name=".teachingDataActivity"
             android:screenOrientation="landscape"/>
+        <activity
+            android:name=".controllerActivity"/>
     </application>
 
 </manifest>

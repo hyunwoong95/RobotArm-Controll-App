@@ -101,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
 //                        // 기타 상태 처리
 //                        Toast.makeText(MainActivity.this, "Device state unknown", Toast.LENGTH_SHORT).show();
 //                    }
-                    Intent intent = new Intent(MainActivity.this, joystickActivity.class);
+                    //Intent intent = new Intent(MainActivity.this, joystickActivity.class);
+                    Intent intent = new Intent(MainActivity.this, controllerActivity.class);
                     startActivity(intent);
                 }else{
                     Toast.makeText(getApplicationContext(),"연결된 장치가 없습니다. 연결후 시도 해주세요.",Toast.LENGTH_LONG).show();

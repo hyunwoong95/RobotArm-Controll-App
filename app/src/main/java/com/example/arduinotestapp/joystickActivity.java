@@ -59,9 +59,6 @@ public class joystickActivity extends AppCompatActivity {
     private BluetoothGattService service = bluetoothGatt.getService(MY_CUSTOM_SERVICE_UUID);
     private BluetoothGattCharacteristic characteristic = service.getCharacteristic(MY_CUSTOM_CHARACTERISTIC_UUID);
 
-    private Queue<byte[]> commandQueue = new LinkedList<>();
-    private boolean isWriting = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -95,6 +92,7 @@ public class joystickActivity extends AppCompatActivity {
                     header += Integer.toString(angle);
                     byte[] data = header.getBytes();
 
+
                     sendCommand(data);
                 }
 
@@ -105,6 +103,7 @@ public class joystickActivity extends AppCompatActivity {
 
                     sendCommand(data);
                 }
+
 
             }
         },100);
@@ -135,7 +134,7 @@ public class joystickActivity extends AppCompatActivity {
                 }
 
             }
-        },100);
+        },500);
 
         leftTurn.setOnClickListener(new Button.OnClickListener(){
             @Override
@@ -187,55 +186,29 @@ public class joystickActivity extends AppCompatActivity {
     }
 
     public void sendCommand(byte[] command){
-
-        commandQueue.add(command);
-        Log.d(TAG,"Command added to queue");
-
-        if(!isWriting){
-            processNextCommand();
-        }
-    }
-
-    private void processNextCommand() {
-        if (commandQueue.isEmpty()) {
-            isWriting = false;
-            Log.d(TAG,"Queue is empty, no more commands to process");
-            return;
-        }
-
-        isWriting = true;
-
-        byte[] command = commandQueue.poll();
-        Log.d(TAG,"Processing next command");
-
+        Log.d(TAG,"sendCommand");
         if (characteristic != null) {
             characteristic.setValue(command);
             boolean success = bluetoothGatt.writeCharacteristic(characteristic);
             if (!success) {
                 Log.e(TAG, "Failed to write characteristic");
-                isWriting = false;
             }
         } else {
             Log.e(TAG, "Characteristic is null, cannot send command");
-            isWriting = false;
         }
     }
 
-    // 블루투스 쓰기 완료 콜백에서 다음 명령을 처리
     private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d(TAG, "Write successful");
+                Log.d("JoystickActivity", "Write successful");
             } else {
-                Log.e(TAG, "Write failed with status: " + status);
+                Log.e("JoystickActivity", "Write failed with status: " + status);
             }
-            // 쓰기 완료 후 다음 명령을 처리
-            processNextCommand();
         }
-
-        // 기타 콜백 메서드...
     };
+
 
 }
